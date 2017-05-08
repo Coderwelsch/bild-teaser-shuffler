@@ -1,128 +1,113 @@
 import React from 'react';
 import {
-  Image,
-  StyleSheet,
-  Text,
+	Image,
+	StyleSheet,
+	Text,
 	Button,
-  View,
+	View,
 } from 'react-native';
 
 
 export default class HomeScreen extends React.Component {
-  static route = {
-    navigationBar: {
-      visible: false
-    }
-  };
+	static route = {
+		navigationBar: {
+			visible: false
+		}
+	};
 
-  constructor (props) {
-  	super(props);
+	constructor (props) {
+		super(props);
 
-    this.state = {
-    	teasers: [""],
-    	headlines: [""],
-    	currentTeaser: "",
-    	currentHeadline: ""
-    }
+		this.state = {
+			teasers: [""],
+			headlines: [""],
+			currentTeaser: "",
+			currentHeadline: ""
+		};
 
-    fetch('http://bild.de')
-      .then((response) => response.text())
-      .then((responseHTML) => {
-          
-          var matches = this.extractMeta(responseHTML);
+		fetch('http://bild.de')
+			.then((response) => response.text())
+			.then((responseHTML) => {
+				var matches = this.extractMeta(responseHTML);
 
-          console.log(matches);
+				this.setState({
+					teasers: matches.kickers,
+					headlines: matches.headlines
+				});
 
-          this.setState({
-            teasers: matches.kickers,
-            headlines: matches.headlines
-          })
+				this.randomize();
 
-          this.randomize();
+				return console.log(responseHTML);
 
+			})
+			.catch((error) => {
+				console.error("Error: ", error);
+			});
+	}
 
-          return console.log(responseHTML);
+	extractMeta(body) {
+		var kickers = [];
+		var headlines = [];
+		var reKicker = /\<span class="kicker"\>(.*?)\<\/span\>/g;
+		var reHeadline = /\<span class="headline"\>(.*?)\<\/span\>/g;
 
-      })
-      .catch((error) => {
-          console.error("Error: ", error);
-      });
-  }
+		var matched;
+		var i = 0;
 
-  extractMeta(body) {
-    var kickers = [];
-    var headlines = []
-    var reKicker = /\<span class="kicker"\>(.*?)\<\/span\>/g;
-    var reHeadline = /\<span class="headline"\>(.*?)\<\/span\>/g;
+		while (matched = reKicker.exec(body)) {
+			kickers[i] = matched[1];
+			i++;
+		}
 
-     var matched;
-     var i = 0;
+		var matched;
+		i = 0;
+		while (matched = reHeadline.exec(body)) {
+			headlines[i] = matched[1].replace("<br />", " ").replace("<span>", " ").replace("<br />", " ") ;
+			i++;
+		}
 
-     while (matched = reKicker.exec(body)) {
-         kickers[i] = matched[1];
-         // console.log(matched[1]);
-         i++;
-     }
-
-     var matched;
-     i = 0;
-     while (matched = reHeadline.exec(body)) {
-         headlines[i] = matched[1].replace("<br />", " ").replace("<span>", " ").replace("<br />", " ") ;
-         // console.log(matched[1].replace("<br />", " "));
-         i++;
-     }
-
-
-     return {kickers, headlines};
-
-
-  }
+		return {kickers, headlines};
+	}
 
 	setRandomTeaser() {
-  	let teasers = this.state.teasers,
-		randomItem = teasers[ Math.floor( Math.random() * teasers.length ) ];
+		let teasers = this.state.teasers,
+			randomItem = teasers[ Math.floor( Math.random() * teasers.length ) ];
 
-  	this.setState({
-		currentTeaser: randomItem
-	});
-  }
+		this.setState({
+			currentTeaser: randomItem.toUpperCase()
+		});
+	}
 
 	setRandomHeadline() {
-	  let headlines = this.state.headlines,
-		  randomItem = headlines[ Math.floor( Math.random() * headlines.length ) ];
+		let headlines = this.state.headlines,
+			randomItem = headlines[ Math.floor( Math.random() * headlines.length ) ];
 
-	  this.setState({
+		this.setState({
 			currentHeadline: randomItem
 		});
-  }
+	}
 
-  randomize() {
-  	this.setRandomTeaser();
-  	this.setRandomHeadline();
-  }
+	randomize() {
+		this.setRandomTeaser();
+		this.setRandomHeadline();
+	}
 
-  render() {
-    return (
-        <View style={styles.mainView}>
-			<View style={styles.centeredView}>
-			  <Text style={styles.teaserText}>
-				{this.state.currentTeaser}
-			  </Text>
-				<Text style={styles.headlineText}>
-					{this.state.currentHeadline}
-				</Text>
+	render() {
+		return (
+			<View style={styles.mainView}>
+				<View style={styles.centeredView}>
+					<Text style={styles.teaserText}>
+						{this.state.currentTeaser}
+					</Text>
+					<Text style={styles.headlineText}>
+						{this.state.currentHeadline}
+					</Text>
+				</View>
+
+				<Button title="More Trash" theme="dark" onPress={ this.randomize.bind(this) } />
 			</View>
-
-			<Button
-			title = "PUSH"
-			color = "#ABCDEF"
-			onPress={this.randomize.bind(this)}
-			/>
-
-
-        </View>
-    );
-  }
+		);
+	}
 }
 
 const styles = StyleSheet.create({
@@ -135,13 +120,20 @@ const styles = StyleSheet.create({
 	centeredView: {
 
 	},
+	randomizeBtn: {
+		alignContent: "flex-end",
+		color: "#000000",
+		backgroundColor: "#DD0000"
+	},
 	teaserText: {
-	  textAlign: "center",
-      color: "#DD0000"
-    },
+		textAlign: "center",
+		fontWeight: "bold",
+		color: "#DD0000"
+	},
 	headlineText: {
 		textAlign: "center",
 		color: "#000000",
+		fontWeight: "bold",
 		fontSize: 21
 	}
 });
