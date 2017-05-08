@@ -62,13 +62,11 @@ export default class HomeScreen extends React.Component {
 		var matched;
 		i = 0;
 		while (matched = reHeadline.exec(body)) {
-			headlines[i] = matched[1].replace("<br />", " ");
+			headlines[i] = matched[1].replace("<br />", " ").replace("<span>", " ").replace("<br />", " ") ;
 			i++;
 		}
 
 		return {kickers, headlines};
-
-
 	}
 
 	setRandomTeaser() {
