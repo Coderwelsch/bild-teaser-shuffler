@@ -17,14 +17,64 @@ export default class HomeScreen extends React.Component {
 
   constructor (props) {
   	super(props);
-	  console.log("ssssss");
 
-	this.state = {
-		teasers: [ "Test Teaser 1", "Test Teaser 2" ],
-		headlines: [ "Test Headline 1", "Test Headline 2" ],
-		currentTeaser: "Random Teaser Text",
-		currentHeadline: "Random Headline Text"
-	}
+    this.state = {
+    	teasers: [""],
+    	headlines: [""],
+    	currentTeaser: "",
+    	currentHeadline: ""
+    }
+
+    fetch('http://bild.de')
+      .then((response) => response.text())
+      .then((responseHTML) => {
+          
+          var matches = this.extractMeta(responseHTML);
+
+          console.log(matches);
+
+          this.setState({
+            teasers: matches.kickers,
+            headlines: matches.headlines
+          })
+
+          this.randomize();
+
+
+          return console.log(responseHTML);
+
+      })
+      .catch((error) => {
+          console.error("Error: ", error);
+      });
+  }
+
+  extractMeta(body) {
+    var kickers = [];
+    var headlines = []
+    var reKicker = /\<span class="kicker"\>(.*?)\<\/span\>/g;
+    var reHeadline = /\<span class="headline"\>(.*?)\<\/span\>/g;
+
+     var matched;
+     var i = 0;
+
+     while (matched = reKicker.exec(body)) {
+         kickers[i] = matched[1];
+         // console.log(matched[1]);
+         i++;
+     }
+
+     var matched;
+     i = 0;
+     while (matched = reHeadline.exec(body)) {
+         headlines[i] = matched[1].replace("<br />", " ");
+         // console.log(matched[1].replace("<br />", " "));
+         i++;
+     }
+
+     return {kickers, headlines};
+
+
   }
 
 	setRandomTeaser() {
