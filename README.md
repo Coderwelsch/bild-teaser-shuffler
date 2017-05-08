@@ -1,1 +1,1 @@
-:D
+Crawls related headlines and kickers from german newspaper website and constructs new random combinations
