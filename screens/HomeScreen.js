@@ -19,6 +19,19 @@ export default class HomeScreen extends React.Component {
     },
   };
 
+  constructor(props){
+    super(props);
+
+    fetch('https://facebook.github.io/react-native/movies.json')
+      .then((response) => response.json())
+      .then((responseJson) => {
+        return console.log(responseJson.movies);
+      })
+      .catch((error) => {
+        console.error("Error: ", error);
+      });
+  }
+
   render() {
     return (
       <View style={styles.container}>
