@@ -20,6 +20,10 @@
     "assetExts": ["ttf"]
   },
   "ios": {
-    "supportsTablet": true
+    "supportsTablet": true,
+    "bundleIdentifier": "de.bild.kick.alternative-news"
+  },
+  "android": {
+    "package": "alternative-news"
   }
 }
